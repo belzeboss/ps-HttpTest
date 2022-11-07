@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="EN">
+    <title>DynaChart</title>
+    <head>
+        <script src="dynaChart.js"></script>
+    </head>
+    <body>
+        <div>
+            <input id="command" type="text" style="width: 500px" title="Test"/>
+            <input value="Update" type="button" onclick="updateChart();"/>
+            <input value="Peek" type="button" onclick="peek();"/>
+        </div>
+        <br>
+        <div>
+            <input id="name" type="text" style="width: 500px" title="Test" value="current"/>
+            <input value="Save" type="button" onclick="save();"/>
+            <input value="Load" type="button" onclick="load();"/>
+        </div>
+
+        <div id="chartContainer" style="height: 500px; width: 100%;"></div>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </body>
+</html>
