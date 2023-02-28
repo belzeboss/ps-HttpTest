@@ -1,0 +1,143 @@
+<div>
+    <canvas id="canvas"  style="width:auto;height:90%" width="1000" height="1000" \>
+</div>
+<div>
+    <label for="exponent">Exponent</label>
+    <input type="number" id="exponent" value="2"> <br>
+    <label for="iterations">Iterations</label>
+    <input type="number" id="iterations" value="100" min="10"> <br>
+    <label for="centerReal">Center.Real.X100</label>
+    <input type="number" id="centerReal" value="0" min="-400" max="400"> <br>
+    <label for="centerImag">Center.Imaginary.X100</label>
+    <input type="number" id="centerImag" value="0" min="-400" max="400"> <br>
+    <label for="range">Range</label>
+    <input type="number" id="range" value="400" min="10" max="400">
+</div>
+<script>
+class complex {
+    constructor(r,i){ this.r = r; this.i = i }
+    magnitudeSquared(){ return this.r*this.r + this.i*this.i }
+    magnitude(){ return Math.sqrt(this.magnitudeSquared()) }
+    phase(){ return Math.atan2(this.i, this.r) }
+    add(c) { return new complex(this.r+c.r,this.i+c.i) }
+    mul(c) { return new complex(this.r*c.r-this.i*c.i, this.r * c.i + this.i * c.r) }
+    squared(){ return this.mul(this) }
+    powInt(n){
+        var magnitude = Math.pow(this.magnitude(), n)
+        var phase = this.phase() * n
+        return new complex(Math.cos(phase) * magnitude, Math.sin(phase) * magnitude)
+    }
+}
+
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+const exponent_input = document.getElementById("exponent")
+const iterations_input = document.getElementById("iterations")
+const centerReal_input = document.getElementById("centerReal")
+const centerImag_input = document.getElementById("centerImag")
+const range_input = document.getElementById("range")
+
+var windowWidth = 0.0
+var windowLeft = 0.0
+var windowTop = 0.0
+var res = 0.0
+var current = new complex(0,0)
+updateWindow()
+
+function updateWindow() {
+    windowWidth = range_input.value / 100.0
+    res = windowWidth / canvas.width
+    windowLeft = -windowWidth/2.0 + (centerReal_input.value / 100.0)
+    windowTop = -windowWidth/2.0 + (centerImag_input.value / 100.0)
+}
+function updateWindowAndDraw() {
+    updateWindow()
+    fillCanvas(1)
+}
+
+var fractal = function(acc, seed, constant){
+    return acc.mul(acc).add(constant)
+}
+
+function fillCanvas(skip){
+    var depth = iterations_input.value
+    var res = windowWidth / canvas.width
+    for (var y = 0; y < canvas.height; y+=skip) {
+        for (var x = 0; x < canvas.width; x+=skip) {
+            var seed = new complex(windowLeft + x * res, windowTop + y * res)
+            var iterations = 0.0
+            var acc = seed;
+            while (acc.magnitudeSquared() < 4.0 && iterations < depth) {
+            iterations++
+            acc = fractal(acc, seed, current)
+            }
+            const f = iterations / depth
+            context.fillStyle = `rgb(${f * 255},${f * 255},${f * 255})`;
+            //context.fillStyle = `hsl(${f * 350},${f*f*70+30}%,50%)`;
+            context.fillRect(x, y, skip, skip);
+        }
+    }
+}
+
+var mouseIsDown = false
+canvas.addEventListener("mousemove", function(e) {
+    if (!mouseIsDown) return
+    updateWindow()
+    const rect = canvas.getBoundingClientRect()
+    var x = Math.floor(e.x * canvas.width / rect.width);
+    var y = Math.floor(e.y * canvas.height / rect.height);
+    current = new complex(windowLeft + x * res, windowTop + y * res)
+    currentSkip = 20
+    fillCanvas(20)
+}, true)
+
+
+canvas.addEventListener("mousedown", function(e) {
+    mouseIsDown = true
+}, true)
+
+canvas.addEventListener("mouseup", function(e) {
+    updateWindow()
+    mouseIsDown = false
+    const rect = canvas.getBoundingClientRect()
+    var x = Math.floor(e.x * canvas.width / rect.width);
+    var y = Math.floor(e.y * canvas.height / rect.height);
+    current = new complex(windowLeft + x * res, windowTop + y * res)
+    fillCanvas(1)
+}, true)
+
+
+exponent_input.addEventListener("change", function(e){
+    if (exponent_input.value == 0)
+    {
+        fractal = function(z, s, c){ return z.mul(z).add(s) }
+    }
+    else if(exponent_input.value == 1)
+    {
+        fractal = function(z, s, c){ return z.add(c) }
+    }
+    else if(exponent_input.value == 2)
+    {
+        fractal = function(z, s, c){ return z.mul(z).add(c) }
+    }
+    else if(exponent_input.value == 3)
+    {
+        fractal = function(z, s, c){ return z.mul(z).mul(z).add(c) }
+    }
+    else if(exponent_input.value == 4)
+    {
+        fractal = function(z, s, c){ return z.mul(z).mul(z).mul(z).add(c) }
+    }
+    else
+    {
+        fractal = function(z, s, c){ return z.powInt(exponent_input.value).add(c) }
+    }
+}, true)
+
+exponent_input.addEventListener("change", updateWindowAndDraw, true)
+iterations_input.addEventListener("change", updateWindowAndDraw, true)
+centerReal_input.addEventListener("change", updateWindowAndDraw, true)
+centerImag_input.addEventListener("change", updateWindowAndDraw, true)
+range_input.addEventListener("change", updateWindowAndDraw, true)
+
+</script>
