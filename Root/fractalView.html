@@ -1,5 +1,5 @@
 <div>
-    <canvas id="canvas"  style="width:auto;height:90%" width="100" height="100" \>
+    <canvas id="canvas"  style="width:auto;height:90%" width="500" height="500" \>
 </div>
 <div>
     <label for="exponent">Exponent</label>
@@ -82,33 +82,44 @@ function fillCanvas(skip){
     }
 }
 
+
+
+
 var mouseIsDown = false
-canvas.addEventListener("mousemove", function(e) {
-    if (!mouseIsDown) return
+
+function updateCurrent(e){
     updateWindow()
     const rect = canvas.getBoundingClientRect()
     var x = Math.floor(e.x * canvas.width / rect.width);
     var y = Math.floor(e.y * canvas.height / rect.height);
     current = new complex(windowLeft + x * res, windowTop + y * res)
-    currentSkip = 20
-    fillCanvas(20)
-}, true)
+}
 
 
-canvas.addEventListener("mousedown", function(e) {
-    mouseIsDown = true
-}, true)
 
+canvas.addEventListener("mousedown", function(e) { mouseIsDown = true }, true)
 canvas.addEventListener("mouseup", function(e) {
-    updateWindow()
     mouseIsDown = false
-    const rect = canvas.getBoundingClientRect()
-    var x = Math.floor(e.x * canvas.width / rect.width);
-    var y = Math.floor(e.y * canvas.height / rect.height);
-    current = new complex(windowLeft + x * res, windowTop + y * res)
+    updateCurrent(e)
     fillCanvas(1)
 }, true)
+canvas.addEventListener("mousemove", function(e) {
+    if (!mouseIsDown) return
+    updateCurrent(e)
+    fillCanvas(10)
+}, true)
 
+canvas.addEventListener("touchstart", function(e) { mouseIsDown = true }, true)
+canvas.addEventListener("touchend", function(e) {
+    mouseIsDown = false
+    updateCurrent(e)
+    fillCanvas(1)
+}, true)
+canvas.addEventListener("touchmove", function(e) {
+    if (!mouseIsDown) return
+    updateCurrent(e)
+    fillCanvas(20)
+}, true)
 
 exponent_input.addEventListener("change", function(e){
     if (exponent_input.value == 0)
@@ -142,7 +153,6 @@ iterations_input.addEventListener("change", updateWindowAndDraw, true)
 centerReal_input.addEventListener("change", updateWindowAndDraw, true)
 centerImag_input.addEventListener("change", updateWindowAndDraw, true)
 range_input.addEventListener("change", updateWindowAndDraw, true)
-
 pixelCount_input.addEventListener("change", function(e){
     canvas.width = pixelCount_input.value
     canvas.width = pixelCount_input.value
