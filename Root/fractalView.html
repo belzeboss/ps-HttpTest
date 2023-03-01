@@ -1,5 +1,5 @@
 <div>
-    <canvas id="canvas"  style="width:auto;height:90%" width="1000" height="1000" \>
+    <canvas id="canvas"  style="width:auto;height:90%" width="100" height="100" \>
 </div>
 <div>
     <label for="exponent">Exponent</label>
@@ -11,7 +11,9 @@
     <label for="centerImag">Center.Imaginary.X100</label>
     <input type="number" id="centerImag" value="0" min="-400" max="400"> <br>
     <label for="range">Range</label>
-    <input type="number" id="range" value="400" min="10" max="400">
+    <input type="number" id="range" value="400" min="10" max="400"> <br>
+    <label for="pixelCount">Pixel</label>
+    <input type="number" id="pixelCount" value="100" min="50">
 </div>
 <script>
 class complex {
@@ -36,6 +38,7 @@ const iterations_input = document.getElementById("iterations")
 const centerReal_input = document.getElementById("centerReal")
 const centerImag_input = document.getElementById("centerImag")
 const range_input = document.getElementById("range")
+const pixelCount_input = document.getElementById("pixelCount")
 
 var windowWidth = 0.0
 var windowLeft = 0.0
@@ -139,5 +142,11 @@ iterations_input.addEventListener("change", updateWindowAndDraw, true)
 centerReal_input.addEventListener("change", updateWindowAndDraw, true)
 centerImag_input.addEventListener("change", updateWindowAndDraw, true)
 range_input.addEventListener("change", updateWindowAndDraw, true)
+
+pixelCount_input.addEventListener("change", function(e){
+    canvas.width = pixelCount_input.value
+    canvas.width = pixelCount_input.value
+    updateWindowAndDraw()
+}, true)
 
 </script>
